@@ -1,0 +1,32 @@
+==================================================
+ FEUNRMF - PC16 ENHANCED OOP
+ Student: Class Hierarchy & Mixins (Week 10)
+==================================================
+
+--- 1. Polymorphism Demonstration (List<Vehicle>) ---
+  🚌 JEEPNEY [JEP-101] - Route: Quiapo - Fairview
+     Passengers: 0/20 | Base Fare: ₱13.00
+
+  🚍 BUS [BUS-505] (Aircon) - Route: PITX - Fairview Busway
+     Passengers: 0/50 | Rate: ₱2.50/km
+
+  ⚡ E-JEEPNEY [EV-909] - Route: FEU - Divisoria
+     Passengers: 0/24 | Battery: 100.0%
+
+--- 2. Abstract Interface Test (Fare Calculations for 10 km) ---
+  [Jeepney Ticket - JEP-101] Distance: 10km | Fare: ₱23.80
+  🚍 [Bus Ticket (Air-Conditioned) - BUS-505] Distance: 10km | Fare: ₱30.00
+  [Jeepney Ticket - EV-909] Distance: 10km | Fare: ₱25.80
+
+--- 3. Mixin Capability Test (ElectricPowertrain) ---
+  ⚡ E-JEEPNEY [EV-909] - Route: FEU - Divisoria
+     Passengers: 0/24 | Battery: 100.0%
+  [EV System] Battery consumed. Remaining: 75.0%
+  [EV System] Battery charged to 90.0%
+  ⚡ E-JEEPNEY [EV-909] - Route: FEU - Divisoria
+     Passengers: 0/24 | Battery: 90.0%
+
+==================================================
+ Enhanced OOP Application Executed Successfully
+ Ready for Week 11 Async extensions.
+==================================================

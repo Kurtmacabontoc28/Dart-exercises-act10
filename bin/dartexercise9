@@ -1,0 +1,185 @@
+abstract class FareCalculable {
+  double calculateFare(double distanceKm);
+
+  void generateTicket(double distanceKm);
+}
+mixin ElectricPowertrain {
+  double _batteryLevel = 100.0;
+
+  double get batteryLevel => _batteryLevel;
+
+  void chargeBattery(double amount) {
+    _batteryLevel = (_batteryLevel + amount).clamp(0.0, 100.0);
+    print('  [EV System] Battery charged to ${_batteryLevel.toStringAsFixed(1)}%');
+  }
+
+  void consumeBattery(double amount) {
+    _batteryLevel = (_batteryLevel - amount).clamp(0.0, 100.0);
+    print('  [EV System] Battery consumed. Remaining: ${_batteryLevel.toStringAsFixed(1)}%');
+  }
+}
+
+class Vehicle {
+  String route;
+  String plateNumber;
+  int capacity;
+  int _passengerCount;
+
+  Vehicle({
+    required this.route,
+    required this.plateNumber,
+    required this.capacity,
+    int initialPassengers = 0,
+  }) : _passengerCount = initialPassengers;
+
+  int get passengerCount => _passengerCount;
+
+  bool boardPassengers(int count) {
+    if (count <= 0) return false;
+    if (_passengerCount + count > capacity) {
+      print('  [Alert] Cannot board $count passengers on $plateNumber. Exceeds capacity!');
+      return false;
+    }
+    _passengerCount += count;
+    print('  [Boarded] $count passenger(s) onto $plateNumber.');
+    return true;
+  }
+
+  void displayStatus() {
+    print('  [Base Vehicle] $plateNumber ($route) | Pass: $_passengerCount/$capacity');
+  }
+}
+
+class Jeepney extends Vehicle implements FareCalculable {
+  double baseFare;
+
+  Jeepney({
+    required String route,
+    required String plateNumber,
+    required int capacity,
+    this.baseFare = 13.0,
+  }) : super(route: route, plateNumber: plateNumber, capacity: capacity);
+
+  @override
+  double calculateFare(double distanceKm) {
+    if (distanceKm <= 4.0) return baseFare;
+    return baseFare + ((distanceKm - 4.0) * 1.80);
+  }
+
+  @override
+  void generateTicket(double distanceKm) {
+    double fare = calculateFare(distanceKm);
+    print('  [Jeepney Ticket - $plateNumber] Distance: ${distanceKm}km | Fare: ₱${fare.toStringAsFixed(2)}');
+  }
+
+  // Polymorphic Method Override
+  @override
+  void displayStatus() {
+    print('  🚌 JEEPNEY [$plateNumber] - Route: $route');
+    print('     Passengers: $passengerCount/$capacity | Base Fare: ₱${baseFare.toStringAsFixed(2)}');
+  }
+}
+
+class Bus extends Vehicle implements FareCalculable {
+  bool isAirConditioned;
+  double ratePerKm;
+
+  Bus({
+    required String route,
+    required String plateNumber,
+    required int capacity,
+    this.isAirConditioned = true,
+    this.ratePerKm = 2.50,
+  }) : super(route: route, plateNumber: plateNumber, capacity: capacity);
+
+  @override
+  double calculateFare(double distanceKm) {
+    double fare = distanceKm * ratePerKm;
+    if (isAirConditioned) {
+      fare += 5.0; 
+    }
+    return fare;
+  }
+
+  @override
+  void generateTicket(double distanceKm) {
+    double fare = calculateFare(distanceKm);
+    String type = isAirConditioned ? 'Air-Conditioned' : 'Standard';
+    print('  🚍 [Bus Ticket ($type) - $plateNumber] Distance: ${distanceKm}km | Fare: ₱${fare.toStringAsFixed(2)}');
+  }
+
+  @override
+  void displayStatus() {
+    String type = isAirConditioned ? 'Aircon' : 'Ordinary';
+    print('  🚍 BUS [$plateNumber] ($type) - Route: $route');
+    print('     Passengers: $passengerCount/$capacity | Rate: ₱${ratePerKm.toStringAsFixed(2)}/km');
+  }
+}
+
+class EJeepney extends Jeepney with ElectricPowertrain {
+  EJeepney({
+    required String route,
+    required String plateNumber,
+    required int capacity,
+  }) : super(route: route, plateNumber: plateNumber, capacity: capacity, baseFare: 15.0);
+
+  @override
+  void displayStatus() {
+    print('  ⚡ E-JEEPNEY [$plateNumber] - Route: $route');
+    print('     Passengers: $passengerCount/$capacity | Battery: ${batteryLevel.toStringAsFixed(1)}%');
+  }
+}
+
+void main() {
+  print('==================================================');
+  print(' FEUNRMF - PC16 ENHANCED OOP');
+  print(' Student: Class Hierarchy & Mixins (Week 10)');
+  print('==================================================\n');
+
+  Jeepney traditionalJeep = Jeepney(
+    route: 'Quiapo - Fairview',
+    plateNumber: 'JEP-101',
+    capacity: 20,
+  );
+
+  Bus cityBus = Bus(
+    route: 'PITX - Fairview Busway',
+    plateNumber: 'BUS-505',
+    capacity: 50,
+    isAirConditioned: true,
+  );
+
+  EJeepney modernEJeep = EJeepney(
+    route: 'FEU - Divisoria',
+    plateNumber: 'EV-909',
+    capacity: 24,
+  );
+
+  print('--- 1. Polymorphism Demonstration (List<Vehicle>) ---');
+  List<Vehicle> fleet = [traditionalJeep, cityBus, modernEJeep];
+
+  for (Vehicle vehicle in fleet) {
+    vehicle.displayStatus();
+    print('');
+  }
+
+
+  print('--- 2. Abstract Interface Test (Fare Calculations for 10 km) ---');
+  double testDistance = 10.0;
+  
+  traditionalJeep.generateTicket(testDistance);
+  cityBus.generateTicket(testDistance);
+  modernEJeep.generateTicket(testDistance);
+
+
+  print('\n--- 3. Mixin Capability Test (ElectricPowertrain) ---');
+  modernEJeep.displayStatus();
+  modernEJeep.consumeBattery(25.0);
+  modernEJeep.chargeBattery(15.0);
+  modernEJeep.displayStatus();
+
+  print('\n==================================================');
+  print(' Enhanced OOP Application Executed Successfully');
+  print(' Ready for Week 11 Async extensions.');
+  print('==================================================');
+}
